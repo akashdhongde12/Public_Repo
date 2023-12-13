@@ -1,3 +1,3 @@
 # Public_Repo
 
-It is public repository.
+It is public repo.
