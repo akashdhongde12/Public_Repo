@@ -1,0 +1,387 @@
+package com.dao;
+import java.util.*;
+import com.model.Customer;
+
+public interface CustomerDao {
+	 int addCustomer(Customer c);
+	 int updateCustomer(Customer c);
+	 boolean deleteCustomer(String c_id);
+	 int searchCustomer(String c_id);
+//	 List<Customer> displayAllCustomer();
+	
+}
+=========================================
+
+package com.dao;
+
+import java.util.*;
+
+import java.sql.*;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.*;
+import com.model.Customer;
+
+public class CustomerDaoClass implements CustomerDao{
+	
+	JdbcTemplate jdbc;
+//	ResultSet rs;
+//	PreparedStatement ps;
+//	
+
+	public void setJdbc(JdbcTemplate jdbc) {
+		this.jdbc = jdbc;
+	}
+
+	@Override
+	public int addCustomer(Customer c) {
+		String sql = "insert into customer values ('C'||c1.nextval,'"+ c.getC_name()+"','"+c.getC_address()+"','"+c.getC_mail()+"','"+c.getC_pass()+"',"+c.getC_phone()+",'"+c.getC_type()+"')";
+		
+		System.out.println("Values inserted succesfully...");
+		return jdbc.update(sql);
+	}
+
+	@Override
+	public int updateCustomer(Customer c) {
+		String sql="update customer set c_name='"+c.getC_name()+"',c_address='"+ c.getC_address()+"',"
+				+ "c_email='"+c.getC_mail()+"',c_password='"+ c.getC_pass()+"',c_phone="+c.getC_phone()+","
+						+ "c_type='"+c.getC_type()+"' where c_id='"+c.getC_id()+"' ";
+        System.out.println("Data updated succesfully...");
+		return jdbc.update(sql);
+	}
+
+
+	@Override
+	public boolean deleteCustomer(String c_id) {
+		String sql= "delete from customer where c_id='"+c_id+"'";
+//		System.out.println(sql);
+		int r=jdbc.update(sql);
+//		System.out.println("r"+r);
+		if(r>0)
+			return true;
+		else	
+			return false;
+	}
+
+	@Override
+	public int searchCustomer(String c_id) {
+		String sql = "select * from customer where c_id='"+c_id+"'";
+		
+		List<Map<String,Object>> customer=new LinkedList();
+		
+		customer=jdbc.queryForList(sql);
+		
+		for(int i = 0; i < customer.size(); i++) {
+            System.out.println(customer.get(i));
+        }
+		return jdbc.update(sql);
+		
+	}
+//
+//	@Override
+//	public List<Customer> displayAllCustomer() {
+//		
+//		
+//		String sql="select * from customer";
+//		List <Customer> customer=this.jdbc.queryForList(sql, Customer.class);
+//
+//     	return customer;
+//
+//		
+//	}
+
+}
+=============================================================================================
+
+package com.model;
+
+public class Customer {
+	String c_id,c_name,c_address,c_pass,c_type,c_mail;
+	long c_phone;
+	
+	public String getC_id() {
+		return c_id;
+	}
+
+
+	public void setC_id(String c_id) {
+		this.c_id = c_id;
+	}
+
+
+	public String getC_name() {
+		return c_name;
+	}
+
+
+	public void setC_name(String c_name) {
+		this.c_name = c_name;
+	}
+
+
+	public String getC_address() {
+		return c_address;
+	}
+
+
+	public void setC_address(String c_address) {
+		this.c_address = c_address;
+	}
+
+
+	public String getC_pass() {
+		return c_pass;
+	}
+
+
+	public void setC_pass(String c_pass) {
+		this.c_pass = c_pass;
+	}
+
+
+	public String getC_type() {
+		return c_type;
+	}
+
+
+	public void setC_type(String c_type) {
+		this.c_type = c_type;
+	}
+
+
+	public String getC_mail() {
+		return c_mail;
+	}
+
+
+	public void setC_mail(String c_mail) {
+		this.c_mail = c_mail;
+	}
+
+
+	public long getC_phone() {
+		return c_phone;
+	}
+
+
+	public void setC_phone(long c_phone) {
+		this.c_phone = c_phone;
+	}
+
+
+
+public Customer(String c_name,String c_address,String c_mail,String c_pass,long c_phone,String c_type) {
+	super();
+	
+	this.c_name = c_name;
+	this.c_address = c_address;
+	this.c_mail= c_mail;
+	this.c_pass = c_pass;
+	this.c_phone = c_phone;
+	this.c_type = c_type;
+	
+}
+public Customer(String c_id, String c_name,String c_address,String c_mail,String c_pass,long c_phone,
+		String c_type) {
+	super();
+	this.c_id = c_id;
+	this.c_name = c_name;
+	this.c_address = c_address;
+	this.c_mail= c_mail;
+	this.c_pass = c_pass;
+	this.c_phone = c_phone;
+	this.c_type = c_type;
+	
+}
+
+@Override
+public String toString() {
+	return "Customer [c_id=" + c_id + ", c_name=" + c_name + ", c_address=" + c_address + ", c_mail=" + c_mail + ", c_pass=" + c_pass+", c_phone=" + c_phone+"]";
+}
+public Customer() {
+	System.out.println("Customer module");
+}
+
+
+
+}
+
+==================================================================================
+
+
+package com.presentation;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+import com.dao.CustomerDao;
+import com.dao.CustomerDaoClass;
+import com.model.Customer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class MainApp {
+	Customer addNewCustomer()
+	{
+		String c_name,c_address,c_pass,c_type,c_mail;
+		long c_phone;
+		
+		Scanner sr=new Scanner(System.in);
+		
+		System.out.println("Enter Customer Name");
+		c_name=sr.next();
+		System.out.println("Enter Customer Address");
+		c_address=sr.next();
+		System.out.println("Enter Customer Mail");
+		c_mail=sr.next();
+		System.out.println("Enter Customer Password");
+		c_pass=sr.next();
+		System.out.println("Enter Customer Contact no:");
+		c_phone=sr.nextLong();
+		System.out.println("Enter Customer Type");
+		c_type=sr.next();
+		
+		Customer c=new Customer (c_name,c_address,c_mail,c_pass,c_phone,c_type);
+		return c;
+	}
+	
+	void deleteCustomer(boolean flag)
+	{
+		if(flag)
+			System.out.println("Data deleted successfully!!!!!");
+		else
+			System.out.println("No Data Found");
+	}
+	
+	Customer UpdateNewCustomer()
+	{
+		String c_id,c_name,c_address,c_pass,c_type,c_mail;
+		long c_phone;
+		
+		Scanner sr=new Scanner(System.in);
+		System.out.println("Enter c_id:");
+		c_id=sr.next();
+		
+		System.out.println("Enter new Name");
+		c_name=sr.next();
+		System.out.println("Enter new Address");
+		c_address=sr.next();
+		System.out.println("Enter new Mail");
+		c_mail=sr.next();
+		System.out.println("Enter new Password");
+		c_pass=sr.next();
+		System.out.println("Enter new Contact no:");
+		c_phone=sr.nextLong();
+		System.out.println("Enter new Type");
+		c_type=sr.next();
+		
+		Customer c=new Customer (c_id,c_name,c_address,c_mail,c_pass,c_phone,c_type);
+		return c;
+	}
+	
+//	void displayAllCustomer()
+//	{
+//		
+//	}
+
+//	void searchCustomer() {
+//		Scanner sr1 = new Scanner(System.in);
+//		String c_id;
+//		c_id = sr1.next();
+//		Customer c = new Customer(c_id);
+//	}
+	public MainApp() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args) {
+		Scanner sc=new Scanner(System.in);
+		
+		MainApp main=new MainApp();
+		ApplicationContext ctx=new ClassPathXmlApplicationContext("jdbc.xml");
+		CustomerDaoClass c=(CustomerDaoClass) ctx.getBean("cus1");
+		System.out.println("1--Add");
+		System.out.println("2--Delete");
+		System.out.println("3--Update");
+		System.out.println("4--Search");
+//		System.out.println("5--DisplayAll");
+		System.out.println("Which operation you want : ");
+		int ch=sc.nextInt();
+		String c_id;
+		switch(ch)
+		{
+		case 1:
+			c.addCustomer(main.addNewCustomer());
+			break;
+		case 2:
+			System.out.println("Please enter c_id");
+			c_id=sc.next();
+			boolean flag=c.deleteCustomer(c_id);
+			main.deleteCustomer(flag);
+			break;
+		case 3:
+			c.updateCustomer(main.UpdateNewCustomer());
+			break;
+		case 4:
+	        System.out.println("Please enter c_id");
+			c_id=sc.next();
+			c.searchCustomer(c_id);
+			break;
+//		case 5:
+//			System.out.println("Please enter c_id");
+//			c_id=sc.next();
+//			c.searchCustomer(c_id);
+//			break;
+//			
+//			
+			
+		default:
+				System.out.println("Invalid option .....");
+			
+		}
+		
+		
+		
+		
+
+	}
+
+	
+	
+
+}
+=====================================================================================
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+		<context:component-scan base-package="com"></context:component-scan>
+
+<bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">  
+<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />  
+<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />  
+<property name="username" value="sys as sysdba"/>  
+<property name="password" value="Atos123$" />  
+</bean>  
+  
+<bean id="jdbctemplate" class="org.springframework.jdbc.core.JdbcTemplate" >  
+<property name="dataSource" ref="ds"></property>  
+</bean>  
+
+
+<bean id="cus1" class="com.dao.CustomerDaoClass" autowire="byType">
+
+</bean>
+  
+
+</beans>
+=======================================================================================
